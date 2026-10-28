@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{{ review.title }} — BrandGuard AI</title><link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"></head>
+<body><header class="topbar"><a class="brand" href="/"><span class="brand-mark">B</span><span>BrandGuard <b>AI</b><small>EXPLAINABLE BRAND GOVERNANCE</small></span></a><a class="back-link" href="/">← Dashboard</a></header>
+<main class="shell review-shell">
+  <div class="eyebrow">CONTENT GOVERNANCE / REVIEW #{{ review.id }}</div><h1 class="review-title">{{ review.title }}</h1><p class="review-intro">Review the findings, revise the copy, and record a human decision.</p>
+  <div class="review-meta"><span class="status status-{{ review.status|lower|replace(' ', '-') }}">{{ review.status }}</span><span>Created {{ review.created_at[:16].replace('T',' ') }}</span><span>Updated {{ review.updated_at[:16].replace('T',' ') }}</span></div>
+  <section class="findings-wrap"><div class="panel-heading"><div><span class="step">ANALYSIS RESULTS</span><h2>{{ findings|length }} finding{% if findings|length != 1 %}s{% endif %}</h2><p>Each finding includes the configured rule or fact used by this prototype.</p></div></div>
+  {% for finding in findings %}
+  <article class="finding-card">
+    <div class="finding-top"><span class="severity severity-{{ finding.severity|lower }}">{{ finding.severity }} RISK</span><span class="confidence">{{ finding.confidence }}</span></div>
+    <h3>{{ finding.category }}</h3><div class="flagged"><span>FLAGGED TEXT</span><p>{{ finding.flagged_text }}</p></div>
+    <div class="finding-detail"><span class="detail-icon">i</span><div><b>Why it was flagged</b><p>{{ finding.reason }}</p></div></div>
+    <div class="finding-detail evidence"><span class="detail-icon">✓</span><div><b>Supporting evidence</b><p>{{ finding.evidence }}</p></div></div>
+    <div class="suggestion"><div><span>EDITABLE SUGGESTION</span><p>{{ finding.suggestion }}</p></div><button type="button" class="copy-suggestion" data-suggestion="{{ finding.suggestion|e }}">Use suggestion ↗</button></div>
+  </article>
+  {% endfor %}
+  </section>
+  <section class="panel edit-panel"><div class="panel-heading"><div><span class="step">HUMAN REVIEW</span><h2>Edit & re-check</h2><p>Suggestions never overwrite your draft automatically.</p></div></div>
+    <form action="{{ url_for('update_review', review_id=review.id) }}" method="post" id="updateForm">
+      <label for="draft">Draft content</label><textarea name="draft" id="draft" rows="7" required>{{ review.draft }}</textarea>
+      <div class="status-row"><div><label for="status">Review decision</label><select name="status" id="status"><option {% if review.status == 'Draft' %}selected{% endif %}>Draft</option><option {% if review.status == 'Needs Changes' %}selected{% endif %}>Needs Changes</option><option {% if review.status == 'Approved' %}selected{% endif %}>Approved</option></select></div><button class="button button-primary" type="submit">Save & re-check →</button></div>
+      <p class="helper-text">Selecting “Approved” records your manual decision; it does not mean the system has independently verified every claim.</p>
+    </form>
+  </section>
+  <footer><span>BRANDGUARD AI</span><span>Evidence-based checks · Human decision</span></footer>
+</main>
+<script>
+document.querySelectorAll('.copy-suggestion').forEach(btn => btn.addEventListener('click', () => {
+  const suggestion = btn.dataset.suggestion || '';
+  const area = document.getElementById('draft');
+  if (suggestion && !suggestion.startsWith('No automatic')) {
+    const current = area.value.trim();
+    area.value = current ? current + (/[.!?]$/.test(current) ? ' ' : '. ') + suggestion : suggestion;
+    area.focus();
+    area.scrollIntoView({behavior:'smooth', block:'center'});
+  }
+}));
+</script></body></html>

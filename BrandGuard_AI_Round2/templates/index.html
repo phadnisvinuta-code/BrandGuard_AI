@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BrandGuard AI — Brand Governance</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/"
+        ><span class="brand-mark">B</span
+        ><span
+          >BrandGuard <b>AI</b><small>EXPLAINABLE BRAND GOVERNANCE</small></span
+        ></a
+      >
+      <span class="top-pill"><i></i> Review workspace</span>
+    </header>
+    <main class="shell">
+      <section class="panel" id="getting-started" style="margin-bottom: 24px">
+        <div class="panel-heading">
+          <div>
+            <span class="step">NEW HERE? START HERE</span>
+            <h2>BrandGuard in 4 simple steps</h2>
+            <p>
+              No experience needed. Follow this guide to understand how the
+              review process works.
+            </p>
+          </div>
+        </div>
+
+        <div class="knowledge-columns">
+          <div class="knowledge-column">
+            <h3>01. Set up your brand</h3>
+            <p>
+              Add your approved product facts and brand rules in the Knowledge
+              Base below.
+            </p>
+          </div>
+          <div class="knowledge-column">
+            <h3>02. Enter your content</h3>
+            <p>
+              Paste an advertisement or marketing draft into the Analyze Content
+              box.
+            </p>
+          </div>
+          <div class="knowledge-column">
+            <h3>03. Check the findings</h3>
+            <p>
+              BrandGuard checks your draft against the facts and rules
+              configured in the workspace.
+            </p>
+          </div>
+          <div class="knowledge-column">
+            <h3>04. Review and decide</h3>
+            <p>
+              Read the evidence, edit the draft if needed, and make the final
+              decision yourself.
+            </p>
+          </div>
+        </div>
+
+        <p>
+          <b>First time here?</b> Click “Try Demo” to test a sample
+          advertisement without writing anything yourself.
+        </p>
+      </section>
+
+      <section class="hero">
+        <div>
+          <div class="eyebrow">CONTENT GOVERNANCE / ROUND 2 MVP</div>
+          <h1>
+            Catch brand-risky content<br /><span>before it goes live.</span>
+          </h1>
+          <p>
+            Review draft content against approved facts and brand rules. Every
+            finding explains what triggered it and shows the evidence behind it.
+          </p>
+          <a class="button button-light" href="#analyzer"
+            >Start a review <span>↘</span></a
+          >
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <div class="orb orb-one"></div>
+          <div class="orb orb-two"></div>
+          <div class="shield">✓</div>
+          <div class="scan-line"></div>
+          <div class="mini-card">EVIDENCE LINKED <b>✓ Verified rule</b></div>
+        </div>
+      </section>
+
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %}{% for category, message in messages %}
+      <div class="flash {{ category }}">{{ message }}</div>
+      {% endfor %}{% endif %} {% endwith %}
+
+      <section class="stats">
+        <article class="stat-card">
+          <span class="stat-label">TOTAL REVIEWS</span
+          ><strong>{{ total_reviews }}</strong
+          ><span class="stat-note">Saved in this workspace</span>
+        </article>
+        <article class="stat-card">
+          <span class="stat-label">NEEDS CHANGES</span
+          ><strong>{{ needs_changes }}</strong
+          ><span class="stat-note">Flagged for human review</span>
+        </article>
+        <article class="stat-card">
+          <span class="stat-label">APPROVED</span><strong>{{ approved }}</strong
+          ><span class="stat-note">Marked by a reviewer</span>
+        </article>
+        <article class="stat-card accent-stat">
+          <span class="stat-label">KNOWLEDGE BASE</span
+          ><strong>{{ facts|length + rules|length }}</strong
+          ><span class="stat-note"
+            >{{ facts|length }} facts · {{ rules|length }} rules</span
+          >
+        </article>
+      </section>
+
+      <section class="section-grid" id="analyzer">
+        <div class="panel analyzer-panel">
+          <div class="panel-heading">
+            <div>
+              <span class="step">01 / REVIEW</span>
+              <h2>Analyze content</h2>
+              <p>Paste a draft and run evidence-based checks.</p>
+            </div>
+            <span class="icon-box">⌕</span>
+          </div>
+          <form
+            action="{{ url_for('analyze') }}"
+            method="post"
+            id="analyzeForm"
+          >
+            <label for="title">Review title</label>
+            <input
+              id="title"
+              name="title"
+              placeholder="e.g. Summer bottle campaign"
+              maxlength="120"
+            />
+            <div class="label-row">
+              <label for="draft">Marketing draft</label
+              ><span class="muted">TEXT ONLY · MVP</span>
+            </div>
+            <textarea
+              id="draft"
+              name="draft"
+              rows="7"
+              required
+              placeholder="Paste your marketing copy here..."
+            ></textarea>
+
+            <div class="demo-row">
+              <button
+                class="button button-secondary"
+                type="button"
+                id="loadDemo"
+              >
+                ✨ Fill Example
+              </button>
+
+              <button class="button button-primary" type="button" id="tryDemo">
+                🚀 Try Demo Now
+              </button>
+            </div>
+
+            <p class="muted">
+              Fill Example loads a sample into the form. Try Demo Now runs the
+              sample through the analyzer.
+            </p>
+
+            <button class="button button-primary full" type="submit">
+              Analyze content <span>→</span>
+            </button>
+          </form>
+        </div>
+        <aside class="panel principle-panel">
+          <span class="step">THE BRANDGUARD PRINCIPLE</span>
+          <h2>Evidence over guesswork.</h2>
+          <p>
+            We connect a clear warning to a configured brand rule or approved
+            fact. The reviewer stays in control of every final decision.
+          </p>
+          <div class="principle-item">
+            <span class="principle-icon">01</span>
+            <div>
+              <b>Detect</b
+              ><small>Find configured mismatches and wording risks.</small>
+            </div>
+          </div>
+          <div class="principle-item">
+            <span class="principle-icon">02</span>
+            <div>
+              <b>Explain</b
+              ><small>Show the reason and the relevant evidence.</small>
+            </div>
+          </div>
+          <div class="principle-item">
+            <span class="principle-icon">03</span>
+            <div>
+              <b>Decide</b
+              ><small>Edit, re-check, and set the status yourself.</small>
+            </div>
+          </div>
+          <div class="notice">
+            ⚑
+            <span
+              ><b>Prototype limitation</b><br />Checks only cover the facts and
+              rules currently configured. A clean result is not a
+              guarantee.</span
+            >
+          </div>
+        </aside>
+      </section>
+
+      <section class="panel knowledge-panel" id="knowledge">
+        <div class="panel-heading">
+          <div>
+            <span class="step">02 / CONFIGURE</span>
+            <h2>Brand knowledge base</h2>
+            <p>
+              Add approved information and explicit checks for the analyzer to
+              use.
+            </p>
+          </div>
+        </div>
+        <div class="knowledge-columns">
+          <div class="knowledge-column">
+            <h3>
+              Approved facts <span class="count">{{ facts|length }}</span>
+            </h3>
+            <div class="record-list">
+              {% for fact in facts %}
+              <div class="record">
+                <span class="record-dot"></span>
+                <div>
+                  <b>{{ fact.product }} · {{ fact.fact_key }}</b>
+                  <p>{{ fact.approved_value }}</p>
+                  <small>{{ fact.source_note or 'No source note' }}</small>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+            <form
+              class="compact-form"
+              action="{{ url_for('add_fact') }}"
+              method="post"
+            >
+              <h4>+ Add approved fact</h4>
+              <input name="product" required placeholder="Product name" />
+              <input
+                name="fact_key"
+                required
+                placeholder="Fact name (e.g. Cooling duration)"
+              />
+              <input
+                name="approved_value"
+                required
+                placeholder="Approved value (e.g. 12 hours)"
+              />
+              <input name="source_note" placeholder="Source / approval note" />
+              <button class="button button-secondary full" type="submit">
+                Save fact
+              </button>
+            </form>
+          </div>
+          <div class="knowledge-column">
+            <h3>Brand rules <span class="count">{{ rules|length }}</span></h3>
+            <div class="record-list">
+              {% for rule in rules %}
+              <div class="record">
+                <span class="record-dot rule-dot"></span>
+                <div>
+                  <b>{{ rule.category }}</b>
+                  <p>{{ rule.rule_text }}</p>
+                  <small>Detect: “{{ rule.find_text }}”</small>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+            <form
+              class="compact-form"
+              action="{{ url_for('add_rule') }}"
+              method="post"
+            >
+              <h4>+ Add brand rule</h4>
+              <select name="category">
+                <option>Terminology</option>
+                <option>Required phrase</option>
+                <option>Tone</option>
+                <option>Claim restriction</option>
+                <option>Accessibility</option>
+              </select>
+              <input
+                name="rule_text"
+                required
+                placeholder="Explain the approved rule"
+              />
+              <input
+                name="find_text"
+                required
+                placeholder="Exact text to detect in a draft"
+              />
+              <input
+                name="replacement_text"
+                placeholder="Suggested replacement"
+              />
+              <button class="button button-secondary full" type="submit">
+                Save rule
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel history-panel">
+        <div class="panel-heading">
+          <div>
+            <span class="step">03 / TRACK</span>
+            <h2>Recent reviews</h2>
+            <p>
+              Open a review to inspect findings, edit the draft, and update its
+              status.
+            </p>
+          </div>
+          <span class="icon-box">↻</span>
+        </div>
+        {% if reviews %}
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>REVIEW</th>
+                <th>LAST UPDATED</th>
+                <th>STATUS</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for review in reviews %}
+              <tr>
+                <td>
+                  <b>{{ review.title }}</b
+                  ><small class="table-sub"
+                    >{{ review.draft[:85] }}{% if review.draft|length > 85 %}…{%
+                    endif %}</small
+                  >
+                </td>
+                <td>{{ review.updated_at[:16].replace('T',' ') }}</td>
+                <td>
+                  <span
+                    class="status status-{{ review.status|lower|replace(' ', '-') }}"
+                    >{{ review.status }}</span
+                  >
+                </td>
+                <td>
+                  <a
+                    class="open-link"
+                    href="{{ url_for('review_detail', review_id=review.id) }}"
+                    >Open →</a
+                  >
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+          <div>⌁</div>
+          <b>No reviews yet</b>
+          <p>Analyze a draft to create your first review record.</p>
+        </div>
+        {% endif %}
+      </section>
+      <footer>
+        <span>BRANDGUARD AI</span
+        ><span>Human review stays in control · Text-based prototype</span>
+      </footer>
+    </main>
+    <script>
+      const demoTitle = "Insulated Bottle — Cooling Claim";
+
+      const demoDraft =
+        "Our revolutionary Insulated Bottle keeps every drink cold for 24 hours!";
+
+      // Fill the form with sample content.
+      document.getElementById("loadDemo").addEventListener("click", () => {
+        document.getElementById("title").value = demoTitle;
+        document.getElementById("draft").value = demoDraft;
+        document.getElementById("draft").focus();
+      });
+
+      // Automatically submit a sample for analysis.
+      document.getElementById("tryDemo").addEventListener("click", () => {
+        document.getElementById("title").value = demoTitle;
+        document.getElementById("draft").value = demoDraft;
+        document.getElementById("analyzeForm").requestSubmit();
+      });
+    </script>
+  </body>
+</html>
